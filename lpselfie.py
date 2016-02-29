@@ -6,6 +6,7 @@ from __future__ import print_function
 import cv2
 import numpy as np
 import PIL.Image
+import RPi.GPIO
 import sys
 import threading
 
@@ -69,13 +70,21 @@ def raster_image(of, width, height, pixels):
 			of.write(chr(byteval))
 #		print("")
 
-grabber = Grabber(0)
-grabberThread = threading.Thread(target=grabber.run)
-grabberThread.daemon = True
-grabberThread.start()
+def main():
+	grabber = Grabber(0)
+	grabberThread = threading.Thread(target=grabber.run)
+	grabberThread.daemon = True
+	grabberThread.start()
 
-img = processImage(grabber.getFrame(), 384)
-printImage(img, "/dev/usb/lp0")
-#printImage(img, "/dev/null")
+	RPi.GPIO.setmode(RPi.GPIO.BOARD)
+	RPi.GPIO.setup(5, RPi.GPIO.IN)
+	prev = RPi.GPIO.input(5)
+	while True:
+		cur = RPi.GPIO.input(5)
+		if cur == 1 and prev == 0:
+			img = processImage(grabber.getFrame(), 384)
+			printImage(img, "/dev/usb/lp0")
+		prev = cur
 
-
+if __name__ == '__main__':
+	main()
