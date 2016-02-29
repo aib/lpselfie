@@ -50,7 +50,7 @@ def processImage(img, printWidth):
 
 def printImage(img, dev):
 	with open(dev, 'wb') as of:
-		raster_image(of, img.width, img.height, img.load())
+		raster_image(of, img.size[0], img.size[1], img.load())
 		of.write('\n\n\n\n\x1d\x56\x01') # feed and cut
 
 def raster_image(of, width, height, pixels):
